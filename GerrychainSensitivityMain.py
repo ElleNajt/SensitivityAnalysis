@@ -22,33 +22,35 @@ import matplotlib.pyplot as plt
 
 import pandas
 
-
-graph = Graph.from_file("./PA_VTD.shp")
-
-election = Election("SEN12", {"Dem": "USS12D", "Rep": "USS12R"})
-
-starting_partition = GeographicPartition(
-    graph,
-    assignment="2011_PLA_1",
-    updaters={
-        "polsby_popper" : polsby_popper,
-        "cut_edges": cut_edges,
-        "population": Tally("TOT_POP", alias="population"),
-        "SEN12": election
-    }
-)
+def getting_started():
 
 
-initial_partition = Partition(
-    graph,
-    assignment="2011_PLA_1",
-    updaters={
-        "cut_edges": cut_edges,
-        "population": Tally("TOT_POP", alias="population"),
-        "SEN12": election
-    }
-)
+    graph = Graph.from_file("./PA_VTD.shp")
 
+    election = Election("SEN12", {"Dem": "USS12D", "Rep": "USS12R"})
+
+    starting_partition = GeographicPartition(
+        graph,
+        assignment="2011_PLA_1",
+        updaters={
+            "polsby_popper" : polsby_popper,
+            "cut_edges": cut_edges,
+            "population": Tally("TOT_POP", alias="population"),
+            "SEN12": election
+        }
+    )
+
+    '''
+    initial_partition = Partition(
+        graph,
+        assignment="2011_PLA_1",
+        updaters={
+            "cut_edges": cut_edges,
+            "population": Tally("TOT_POP", alias="population"),
+            "SEN12": election
+        }
+    )
+    '''
 
 def analyze_dem_seats():
 
@@ -130,7 +132,7 @@ def run_with_MCMC_constraints(starting_partition):
         constraints=[single_flip_contiguous],
         accept=popandpolsby_MCMC,
         initial_state=starting_partition,
-        total_steps=100
+        total_steps=10000
     )
 
     for part in chain:
@@ -165,7 +167,7 @@ def run_without_constraints(starting_partition):
         constraints=[single_flip_contiguous],
         accept=always_accept,
         initial_state=starting_partition,
-        total_steps=100
+        total_steps=10000
     )
     for part in chain:
         pass
@@ -193,11 +195,10 @@ def annealing(starting_partition):
     for k in range(stages):
         starting_partition = run_without_constraints(starting_partition)
         annealed_partition = run_with_MCMC_constraints(starting_partition)
-        print(  [deviation(list(annealed_partition["population"].values())), np.mean(list(annealed_partition["polsby_popper"].values()))] )
+        print( "unnealed", [deviation(list(starting_partition["population"].values())), np.mean(list(starting_partition["polsby_popper"].values()))] )
+        print(  "annealed", [deviation(list(annealed_partition["population"].values())), np.mean(list(annealed_partition["polsby_popper"].values()))] )
         annealed_partitions.append(annealed_partition)
         starting_partition = annealed_partition
 
-    for part in annealed_partitions:
-        print(  [deviation(list(annealed_partition["population"].values())), np.mean(list(annealed_partition["polsby_popper"].values()))] )
 
     return True
