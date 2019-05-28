@@ -136,8 +136,16 @@ def run_with_MCMC_constraints(starting_partition):
     for part in chain:
         pass
         #print(deviation(list(part["population"].values())))
-    print(part.parent)
-    print(part.parent is None)
+
+    initial_partition = GeographicPartition(
+    graph,
+    assignment= part.assignment,
+    updaters={
+        "polsby_popper" : polsby_popper,
+        "cut_edges": cut_edges,
+        "population": Tally("TOT_POP", alias="population"),
+        "SEN12": election
+    })
 
     '''
     values = []
@@ -148,7 +156,7 @@ def run_with_MCMC_constraints(starting_partition):
     print('ended', values[-1])
     '''
 
-    return part
+    return initial_partition
 
 def run_without_constraints(starting_partition):
 
