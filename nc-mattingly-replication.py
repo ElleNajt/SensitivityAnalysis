@@ -289,7 +289,7 @@ election = Election("SEN12", {"Dem": "EL14G_USS_", "Rep": "EL14G_US_1"})
 
 starting_partition = GeographicPartition(
     graph,
-    assignment="judge",
+    assignment="oldplan",
     updaters={
         "polsby_popper" : polsby_popper,
         "cut_edges": cut_edges,
@@ -317,26 +317,29 @@ mattingly_accept = MH_Annealer( temp = mattingly_temperature)
 
 pop_list = list(starting_partition["population"].values())
 pop_ideal = np.sum ( pop_list) / 13
-
-
-chain = MarkovChain(
-    proposal=propose_random_flip,
-    constraints=[single_flip_contiguous, no_vanishing_districts],
-    accept=mattingly_accept,
-    initial_state=starting_partition,
-    total_steps=120000
-)
-import time
-tic = time.time()
-step = 0
-for part in chain:
-    step +=1
-    print(step,end='\r')
-    #print(mattinglyscore_2018(part,df))
-    #print("SCORE: {}  STEP: {}".format( mattinglyscore_2018(part,df),step))
-    #print(mattinglyscore_2018(part,df))
-    #print(deviation(list(part["population"].values())))
-    #if step == 120000: print(mattinglyscore_2018(part,df))
-    #clear_output(wait=True)
-print(time.time() - tic)
+chains = 0
+while True:
+    chains +=1
+    outfile = open("mattingly_reproduce.txt",'w')
+    chain = MarkovChain(
+        proposal=propose_random_flip,
+        constraints=[single_flip_contiguous, no_vanishing_districts],
+        accept=mattingly_accept,
+        initial_state=starting_partition,
+        total_steps=120000
+    )
+    import time
+    tic = time.time()
+    step = 0
+    for part in chain:
+        step +=1
+        print(step,end='\r')
+        #print(mattinglyscore_2018(part,df))
+        #print("SCORE: {}  STEP: {}".format( mattinglyscore_2018(part,df),step))
+        #print(mattinglyscore_2018(part,df))
+        #print(deviation(list(part["population"].values())))
+        #if step == 120000: print(mattinglyscore_2018(part,df))
+        #clear_output(wait=True)
+    print(time.time() - tic, chains)
+    outfile.write(part.assignment.parts)
 
