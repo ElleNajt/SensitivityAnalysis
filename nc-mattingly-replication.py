@@ -289,7 +289,7 @@ election = Election("SEN12", {"Dem": "EL14G_USS_", "Rep": "EL14G_US_1"})
 
 starting_partition = GeographicPartition(
     graph,
-    assignment="oldplan",
+    assignment="newplan",
     updaters={
         "polsby_popper" : polsby_popper,
         "cut_edges": cut_edges,
@@ -314,7 +314,7 @@ print(single_flip_contiguous(starting_partition))
 #End hack
 
 mattingly_accept = MH_Annealer( temp = mattingly_temperature)
-
+import time
 pop_list = list(starting_partition["population"].values())
 pop_ideal = np.sum ( pop_list) / 13
 chains = 0
@@ -328,7 +328,7 @@ while True:
         initial_state=starting_partition,
         total_steps=120000
     )
-    import time
+    
     tic = time.time()
     step = 0
     for part in chain:
