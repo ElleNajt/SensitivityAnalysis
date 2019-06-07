@@ -8,6 +8,8 @@
 
 import os
 
+from multiprocessing import Pool
+
 from gerrychain import Graph, GeographicPartition, Partition, Election
 from gerrychain.updaters import Tally, cut_edges
 import geopandas as gpd
@@ -318,9 +320,9 @@ import time
 pop_list = list(starting_partition["population"].values())
 pop_ideal = np.sum ( pop_list) / 13
 chains = 0
-while True:
-    chains +=1
-    outfile = open("mattingly_reproduce.txt",'w')
+outfile = open("mattingly_reproduce.txt",'w')
+def run_a_chain(x):
+
     chain = MarkovChain(
         proposal=propose_random_flip,
         constraints=[single_flip_contiguous, no_vanishing_districts],
@@ -344,3 +346,8 @@ while True:
     outfile.write(str(part.assignment.parts))
     outfile.write("\n")
 
+
+
+
+p = Pool(8)
+p.map(run_a_chain, range(600))
