@@ -341,5 +341,6 @@ while True:
         #if step == 120000: print(mattinglyscore_2018(part,df))
         #clear_output(wait=True)
     print(time.time() - tic, chains)
-    outfile.write(part.assignment.parts)
+    outfile.write(str(part.assignment.parts))
+    outfile.write("\n")
 
